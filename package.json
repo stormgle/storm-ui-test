@@ -1,0 +1,37 @@
+{
+  "name": "react-storm-ui",
+  "version": "1.0.0",
+  "description": "Test project of Stormgle's storm-ui",
+  "main": "index.js",
+  "scripts": {
+    "build" : "babel src -d dist",
+		"prepublish": "npm run build",
+		"compile": "npm run build && browserify dist/ -o bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stormgle/storm-ui-test.git"
+  },
+  "keywords": [
+    "react",
+    "stormgle",
+    "storm-ui"
+  ],
+  "author": "duongtdn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stormgle/storm-ui-test/issues"
+  },
+  "homepage": "https://github.com/stormgle/storm-ui-test#readme",
+	"dependencies" : {		
+		"react": "^15.4.0",
+    "react-dom": "^15.4.0"
+	},
+	"devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-react": "^6.11.1",
+    "babel-plugin-transform-object-rest-spread": "^6.16.0",
+		"browserify": "^13.1.1"
+  }
+}
