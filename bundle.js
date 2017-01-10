@@ -160,9 +160,24 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+/**
+ * Page component
+ * @extends BaseComponent 
+ * */
 var _class = function (_BaseComponent) {
   _inherits(_class, _BaseComponent);
 
+  /**
+   * Render a Page component
+   * @param {function} renderHeader - render Header of Page
+   * @param {function} renderFooter - renderFooter of Page
+   * @param {function} renderFixed - render a fixed component on Page
+   * @param {function} renderModel - render a model cover entire of Page
+   * @param {string} modifier - specify modifier style for Page
+   * @param {function} onInit - function will be invoked after Page is mounted
+   * @param {function} onShow - function will be invoked after page has been shown
+   * @param {function} onHide - function will be invoked after page has been hide
+   */
   function _class(props) {
     _classCallCheck(this, _class);
 
@@ -177,8 +192,11 @@ var _class = function (_BaseComponent) {
   }, {
     key: 'render',
     value: function render() {
+      var themeContainer = 'w3-container';
       var header = this.props.renderHeader ? this.props.renderHeader() : null;
       var footer = this.props.renderFooter ? this.props.renderFooter() : null;
+      var fixed = this.props.renderFixed ? this.props.renderFixed() : null;
+      var model = this.props.renderModel ? this.props.renderModel() : null;
       return _react2.default.createElement(
         'sg-page',
         null,
@@ -188,17 +206,22 @@ var _class = function (_BaseComponent) {
           _react2.default.createElement('div', { className: 'page_background' }),
           _react2.default.createElement(
             'div',
-            { className: 'page_header' },
+            { className: 'page_model ' + themeContainer },
+            model
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'page_header ' + themeContainer },
             header
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_content' },
+            { className: 'page_content ' + themeContainer },
             this.props.children
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_footer' },
+            { className: 'page_footer ' + themeContainer },
             footer
           )
         )
@@ -4047,6 +4070,13 @@ var App = function (_Component) {
 							'h3',
 							null,
 							' Footer '
+						);
+					},
+					renderModel: function renderModel() {
+						return _react2.default.createElement(
+							'h2',
+							null,
+							' Model '
 						);
 					} },
 				_react2.default.createElement(

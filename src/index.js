@@ -16,7 +16,8 @@ class App extends Component {
 		return (
 			<Page 
 				renderHeader = {() => (<h3> Header </h3>)}
-				renderFooter = {() => (<h3> Footer </h3>)} > 
+				renderFooter = {() => (<h3> Footer </h3>)}
+				renderModel  = {() => (<h2> Model </h2>)}	> 
 				
 				<div> Content </div>
 				
