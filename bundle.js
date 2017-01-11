@@ -172,7 +172,10 @@ var _class = function (_BaseComponent) {
    * @param {function} renderHeader - render Header of Page
    * @param {function} renderFooter - renderFooter of Page
    * @param {function} renderFixed - render a fixed component on Page
-   * @param {function} renderModel - render a model cover entire of Page
+   * @param {function} renderModal - render a model cover entire of Page
+   * @param {boolean} hideHeader - hide page header behind background
+   * @param {boolean} hideFooter - hide page footer behind background
+   * @param {boolean} hideModal - hide modal behind background
    * @param {string} modifier - specify modifier style for Page
    * @param {function} onInit - function will be invoked after Page is mounted
    * @param {function} onShow - function will be invoked after page has been shown
@@ -192,11 +195,11 @@ var _class = function (_BaseComponent) {
   }, {
     key: 'render',
     value: function render() {
-      var themeContainer = 'w3-container';
+      var style = 'w3';
       var header = this.props.renderHeader ? this.props.renderHeader() : null;
       var footer = this.props.renderFooter ? this.props.renderFooter() : null;
       var fixed = this.props.renderFixed ? this.props.renderFixed() : null;
-      var model = this.props.renderModel ? this.props.renderModel() : null;
+      var model = this.props.renderModal ? this.props.renderModal() : null;
       return _react2.default.createElement(
         'sg-page',
         null,
@@ -206,22 +209,22 @@ var _class = function (_BaseComponent) {
           _react2.default.createElement('div', { className: 'page_background' }),
           _react2.default.createElement(
             'div',
-            { className: 'page_model ' + themeContainer },
+            { className: 'page_model ' + style + '-container ' + (this.props.hideModal ? 'hide' : '') },
             model
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_header ' + themeContainer },
+            { className: 'page_header ' + style + '-container' },
             header
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_content ' + themeContainer },
+            { className: 'page_content ' + style + '-container' },
             this.props.children
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_footer ' + themeContainer },
+            { className: 'page_footer ' + style + '-container' },
             footer
           )
         )
@@ -4049,6 +4052,15 @@ var App = function (_Component) {
 	}
 
 	_createClass(App, [{
+		key: 'renderModal',
+		value: function renderModal() {
+			return _react2.default.createElement(
+				'button',
+				{ onClick: this.props.hideModel },
+				' Close '
+			);
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			var data = [];
@@ -4072,13 +4084,7 @@ var App = function (_Component) {
 							' Footer '
 						);
 					},
-					renderModel: function renderModel() {
-						return _react2.default.createElement(
-							'h2',
-							null,
-							' Model '
-						);
-					} },
+					renderModal: this.renderModal.bind(this), hideModal: true },
 				_react2.default.createElement(
 					'div',
 					null,

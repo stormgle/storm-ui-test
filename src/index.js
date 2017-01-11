@@ -8,6 +8,12 @@ import { Page } from 'react-storm-ui'
 
 class App extends Component {
 	
+	renderModal() {
+		return (
+			<button onClick = {this.props.hideModel}> Close </button>
+		);
+	}
+	
 	render() {
 		const data = [];
 		for (let i = 1; i < 100; i++) {
@@ -17,7 +23,7 @@ class App extends Component {
 			<Page 
 				renderHeader = {() => (<h3> Header </h3>)}
 				renderFooter = {() => (<h3> Footer </h3>)}
-				renderModel  = {() => (<h2> Model </h2>)}	> 
+				renderModal  = {this.renderModal.bind(this)} hideModal	> 
 				
 				<div> Content </div>
 				
