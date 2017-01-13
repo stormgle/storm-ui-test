@@ -8,9 +8,18 @@ import { Page } from 'react-storm-ui'
 
 class App extends Component {
 	
-	renderModal() {
+	constructor(props) {
+		super(props);
+		this.page = null;
+	}
+	
+	renderModal(page) {
 		return (
-			<button onClick = {this.props.hideModel}> Close </button>
+			<div>
+				<h3> Modal </h3>
+				<br />
+				<button onClick = {page.hideModal}> Close </button>
+			</div>
 		);
 	}
 	
@@ -21,11 +30,19 @@ class App extends Component {
 		}		
 		return (
 			<Page 
+				onInit = {page => this.page = page}
 				renderHeader = {() => (<h3> Header </h3>)}
 				renderFooter = {() => (<h3> Footer </h3>)}
-				renderModal  = {this.renderModal.bind(this)} hideModal	> 
+				renderModal  = {this.renderModal.bind(this)}	> 
+				
+				<div>
+					<button onClick = {this.page.showModal}> Modal </button>
+					<button onClick = {() => this.page.pushOverlay(<div><h2>Overlay</h2><button onClick = {this.page.popOverlay}>Close</button></div>)}> Modal </button>
+				</div>
 				
 				<div> Content </div>
+				
+				
 				
 				{ 
 					data.map( (entry,id) => <div key = {id} > {entry} </div> ) 

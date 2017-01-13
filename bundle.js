@@ -169,14 +169,19 @@ var _class = function (_BaseComponent) {
 
   /**
    * Render a Page component
+   * It renders 6 layers, the order when active is as following
+   *  1 - background layer
+   *  2 - Contend layer
+   *  3 - Header and Footer layer
+   *  4 - Fixed layer
+   *  5 - Overlay layer
+   *  6 - Modal layer
+   * When a layer is hide, it move back to background layer
+   * @param {string} modifier - specify modifier style for Page 
    * @param {function} renderHeader - render Header of Page
    * @param {function} renderFooter - renderFooter of Page
    * @param {function} renderFixed - render a fixed component on Page
    * @param {function} renderModal - render a model cover entire of Page
-   * @param {boolean} hideHeader - hide page header behind background
-   * @param {boolean} hideFooter - hide page footer behind background
-   * @param {boolean} hideModal - hide modal behind background
-   * @param {string} modifier - specify modifier style for Page
    * @param {function} onInit - function will be invoked after Page is mounted
    * @param {function} onShow - function will be invoked after page has been shown
    * @param {function} onHide - function will be invoked after page has been hide
@@ -184,22 +189,110 @@ var _class = function (_BaseComponent) {
   function _class(props) {
     _classCallCheck(this, _class);
 
-    return _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).call(this, props));
+
+    _this.state = {
+      hideHeader: false,
+      hideFooter: false,
+      showModal: false,
+      showOverlay: false
+    };
+
+    _this.page = {
+      pushOverlay: _this.pushOverlay.bind(_this),
+      popOverlay: _this.popOverlay.bind(_this),
+      showModal: _this.showModal.bind(_this),
+      hideModal: _this.hideModal.bind(_this)
+    };
+
+    _this.overlayStack = [];
+
+    _this.bind('_renderOverlay', 'pushOverlay', 'popOverlay', 'showModal', 'hideModal');
+
+    return _this;
   }
 
   _createClass(_class, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      if (this.props.onInit) {
+        this.props.onInit(this.page);
+      }
+    }
+  }, {
     key: 'parseModifier',
     value: function parseModifier() {
       return ''; // implement later
     }
   }, {
+    key: 'pushOverlay',
+    value: function pushOverlay(page) {
+      this.overlayStack.push(page);
+      this.setState({ showOverlay: true });
+    }
+  }, {
+    key: 'popOverlay',
+    value: function popOverlay() {
+      this.overlayStack.pop();
+      if (this.overlayStack.length > 0) {
+        this.setState({ showOverlay: true });
+      } else {
+        this.setState({ showOverlay: false });
+      }
+    }
+  }, {
+    key: 'showModal',
+    value: function showModal() {
+      this.setState({ showModal: true });
+    }
+  }, {
+    key: 'hideModal',
+    value: function hideModal() {
+      this.setState({ showModal: false });
+    }
+  }, {
+    key: '_renderOverlay',
+    value: function _renderOverlay() {
+      var _this2 = this;
+
+      if (this.overlayStack.length > 0) {
+        return _react2.default.createElement(
+          'div',
+          { className: 'overlay_content' },
+          this.overlayStack.map(function (page, id) {
+
+            // for DOM element, not add props
+            if (typeof page.type === 'string') {
+              return _react2.default.createElement(
+                'div',
+                { key: id, className: 'overlay_background' },
+                page
+              );
+            }
+
+            var pageWithProps = _react2.default.cloneElement(page, {
+              popOverlay: _this2.popOverlay,
+              pushOverlay: _this2.pushOverlay
+            });
+            return _react2.default.createElement(
+              'div',
+              { key: id, className: 'overlay_background' },
+              pageWithProps
+            );
+          })
+        );
+      } else {
+        return null;
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       var style = 'w3';
-      var header = this.props.renderHeader ? this.props.renderHeader() : null;
-      var footer = this.props.renderFooter ? this.props.renderFooter() : null;
-      var fixed = this.props.renderFixed ? this.props.renderFixed() : null;
-      var model = this.props.renderModal ? this.props.renderModal() : null;
+      var header = this.props.renderHeader ? this.props.renderHeader(this.page) : null;
+      var footer = this.props.renderFooter ? this.props.renderFooter(this.page) : null;
+      var fixed = this.props.renderFixed ? this.props.renderFixed(this.page) : null;
+      var modal = this.props.renderModal ? this.props.renderModal(this.page) : null;
       return _react2.default.createElement(
         'sg-page',
         null,
@@ -209,12 +302,17 @@ var _class = function (_BaseComponent) {
           _react2.default.createElement('div', { className: 'page_background' }),
           _react2.default.createElement(
             'div',
-            { className: 'page_model ' + style + '-container ' + (this.props.hideModal ? 'hide' : '') },
-            model
+            { className: 'page_modal ' + style + '-container ' + (this.state.showModal ? '' : 'hide') },
+            modal
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_header ' + style + '-container' },
+            { className: 'page_overlay ' + style + '-container ' + (this.state.showOverlay ? '' : 'hide') },
+            this._renderOverlay()
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'page_header ' + style + '-container ' + (this.state.hideHeader ? 'hide' : '') },
             header
           ),
           _react2.default.createElement(
@@ -224,7 +322,7 @@ var _class = function (_BaseComponent) {
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_footer ' + style + '-container' },
+            { className: 'page_footer ' + style + '-container ' + (this.state.hideFooter ? 'hide' : '') },
             footer
           )
         )
@@ -4045,24 +4143,39 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var App = function (_Component) {
 	_inherits(App, _Component);
 
-	function App() {
+	function App(props) {
 		_classCallCheck(this, App);
 
-		return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).apply(this, arguments));
+		var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+
+		_this.page = null;
+		return _this;
 	}
 
 	_createClass(App, [{
 		key: 'renderModal',
-		value: function renderModal() {
+		value: function renderModal(page) {
 			return _react2.default.createElement(
-				'button',
-				{ onClick: this.props.hideModel },
-				' Close '
+				'div',
+				null,
+				_react2.default.createElement(
+					'h3',
+					null,
+					' Modal '
+				),
+				_react2.default.createElement('br', null),
+				_react2.default.createElement(
+					'button',
+					{ onClick: page.hideModal },
+					' Close '
+				)
 			);
 		}
 	}, {
 		key: 'render',
 		value: function render() {
+			var _this2 = this;
+
 			var data = [];
 			for (var i = 1; i < 100; i++) {
 				data.push('Line ' + i);
@@ -4070,6 +4183,9 @@ var App = function (_Component) {
 			return _react2.default.createElement(
 				_reactStormUi.Page,
 				{
+					onInit: function onInit(page) {
+						return _this2.page = page;
+					},
 					renderHeader: function renderHeader() {
 						return _react2.default.createElement(
 							'h3',
@@ -4084,7 +4200,36 @@ var App = function (_Component) {
 							' Footer '
 						);
 					},
-					renderModal: this.renderModal.bind(this), hideModal: true },
+					renderModal: this.renderModal.bind(this) },
+				_react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'button',
+						{ onClick: this.page.showModal },
+						' Modal '
+					),
+					_react2.default.createElement(
+						'button',
+						{ onClick: function onClick() {
+								return _this2.page.pushOverlay(_react2.default.createElement(
+									'div',
+									null,
+									_react2.default.createElement(
+										'h2',
+										null,
+										'Overlay'
+									),
+									_react2.default.createElement(
+										'button',
+										{ onClick: _this2.page.popOverlay },
+										'Close'
+									)
+								));
+							} },
+						' Modal '
+					)
+				),
 				_react2.default.createElement(
 					'div',
 					null,
