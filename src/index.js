@@ -6,6 +6,8 @@ import { render } from 'react-dom'
 
 import { Page } from 'react-storm-ui'
 
+let i = 0;
+
 class App extends Component {
 	
 	constructor(props) {
@@ -23,6 +25,25 @@ class App extends Component {
 		);
 	}
 	
+	showModal () {
+		if (this.page) {
+			this.page.showModal();
+		}
+	}
+	
+	pushOverlay () {
+		if (this.page) {
+			i++;
+			this.page.pushOverlay(
+				<div>
+					<h2> Overlay {i} </h2>
+					<button onClick = {this.page.popOverlay}>Close</button>
+					<button onClick = {this.pushOverlay.bind(this)}>More...</button>
+				</div>
+			)
+		}
+	}
+	
 	render() {
 		const data = [];
 		for (let i = 1; i < 100; i++) {
@@ -36,8 +57,8 @@ class App extends Component {
 				renderModal  = {this.renderModal.bind(this)}	> 
 				
 				<div>
-					<button onClick = {this.page.showModal}> Modal </button>
-					<button onClick = {() => this.page.pushOverlay(<div><h2>Overlay</h2><button onClick = {this.page.popOverlay}>Close</button></div>)}> Modal </button>
+					<button onClick = {this.showModal.bind(this)}> Modal </button>
+					<button onClick = {this.pushOverlay.bind(this)}> Overlay </button>
 				</div>
 				
 				<div> Content </div>

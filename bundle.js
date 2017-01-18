@@ -4140,6 +4140,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var i = 0;
+
 var App = function (_Component) {
 	_inherits(App, _Component);
 
@@ -4172,13 +4174,48 @@ var App = function (_Component) {
 			);
 		}
 	}, {
+		key: 'showModal',
+		value: function showModal() {
+			if (this.page) {
+				this.page.showModal();
+			}
+		}
+	}, {
+		key: 'pushOverlay',
+		value: function pushOverlay() {
+			if (this.page) {
+				i++;
+				this.page.pushOverlay(_react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'h2',
+						null,
+						' Overlay ',
+						i,
+						' '
+					),
+					_react2.default.createElement(
+						'button',
+						{ onClick: this.page.popOverlay },
+						'Close'
+					),
+					_react2.default.createElement(
+						'button',
+						{ onClick: this.pushOverlay.bind(this) },
+						'More...'
+					)
+				));
+			}
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			var _this2 = this;
 
 			var data = [];
-			for (var i = 1; i < 100; i++) {
-				data.push('Line ' + i);
+			for (var _i = 1; _i < 100; _i++) {
+				data.push('Line ' + _i);
 			}
 			return _react2.default.createElement(
 				_reactStormUi.Page,
@@ -4206,28 +4243,13 @@ var App = function (_Component) {
 					null,
 					_react2.default.createElement(
 						'button',
-						{ onClick: this.page.showModal },
+						{ onClick: this.showModal.bind(this) },
 						' Modal '
 					),
 					_react2.default.createElement(
 						'button',
-						{ onClick: function onClick() {
-								return _this2.page.pushOverlay(_react2.default.createElement(
-									'div',
-									null,
-									_react2.default.createElement(
-										'h2',
-										null,
-										'Overlay'
-									),
-									_react2.default.createElement(
-										'button',
-										{ onClick: _this2.page.popOverlay },
-										'Close'
-									)
-								));
-							} },
-						' Modal '
+						{ onClick: this.pushOverlay.bind(this) },
+						' Overlay '
 					)
 				),
 				_react2.default.createElement(
