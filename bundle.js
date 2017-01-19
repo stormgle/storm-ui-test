@@ -195,7 +195,8 @@ var _class = function (_BaseComponent) {
       hideHeader: false,
       hideFooter: false,
       showModal: false,
-      showOverlay: false
+      showOverlay: false,
+      contentPadTop: 0
     };
 
     _this.page = {
@@ -207,7 +208,7 @@ var _class = function (_BaseComponent) {
 
     _this.overlayStack = [];
 
-    _this.bind('_renderOverlay', 'pushOverlay', 'popOverlay', 'showModal', 'hideModal');
+    _this.bind('_renderOverlay', 'pushOverlay', 'popOverlay', 'showModal', 'hideModal', 'getHeaderElement');
 
     return _this;
   }
@@ -218,6 +219,11 @@ var _class = function (_BaseComponent) {
       if (this.props.onInit) {
         this.props.onInit(this.page);
       }
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.setState({ contentPadTop: this.headerElement.clientHeight + 10 });
     }
   }, {
     key: 'parseModifier',
@@ -312,12 +318,13 @@ var _class = function (_BaseComponent) {
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_header ' + style + '-container ' + (this.state.hideHeader ? 'hide' : '') },
+            { className: 'page_header ' + style + '-container ' + (this.state.hideHeader ? 'hide' : ''),
+              ref: this.getHeaderElement },
             header
           ),
           _react2.default.createElement(
             'div',
-            { className: 'page_content ' + style + '-container' },
+            { className: 'page_content ' + style + '-container', style: { paddingTop: this.state.contentPadTop + 'px' } },
             this.props.children
           ),
           _react2.default.createElement(
@@ -327,6 +334,11 @@ var _class = function (_BaseComponent) {
           )
         )
       );
+    }
+  }, {
+    key: 'getHeaderElement',
+    value: function getHeaderElement(el) {
+      this.headerElement = el;
     }
   }]);
 
@@ -4225,7 +4237,7 @@ var App = function (_Component) {
 					},
 					renderHeader: function renderHeader() {
 						return _react2.default.createElement(
-							'h3',
+							'h1',
 							null,
 							' Header '
 						);

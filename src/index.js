@@ -52,7 +52,7 @@ class App extends Component {
 		return (
 			<Page 
 				onInit = {page => this.page = page}
-				renderHeader = {() => (<h3> Header </h3>)}
+				renderHeader = {() => (<h1> Header </h1>)}
 				renderFooter = {() => (<h3> Footer </h3>)}
 				renderModal  = {this.renderModal.bind(this)}	> 
 				
