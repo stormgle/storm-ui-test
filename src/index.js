@@ -98,13 +98,34 @@ class LandingPage extends Component {
 class App extends Component {
 	
 	renderRoute(route, nav) {
+		function nextPage() {
+			if (route.id === 1) {
+				nav.push({ id: 2, name : 'PAGE 2'}, {animation : {name: 'slide-bottom'}});
+			} else if (route.id === 2) {
+				nav.push({ id: 3, name : 'PAGE 3'}, {animation : 'none'});
+			} else {
+				nav.push({ id: route.id + 1, name : `PAGE ${route.id + 1}`});
+			}			
+		}
+		function previousPage() {
+			if (route.id === 2) {
+				nav.pop({animation : {name: 'slide-bottom'}});
+			} else if (route.id === 3) {
+				nav.pop({animation : 'none'});
+			} else {
+				nav.pop();
+			}
+		}
+		function resetStack() {
+			nav.reset({animation : {name : 'slide-top'}});
+		}
 		return (
 			<Page style = {{backgroundColor : colors[route.id]}}
 						renderHeader = {() => (<div style = {{backgroundColor : '#f9f9f9'}}> <label className = 'w3-xxlarge'> {route.name} </label></div>)} >
 						
-				<button onClick = {() => {nav.pop()}}> Back </button>
-				<button onClick = {() => {nav.push({ id: route.id + 1, name : `PAGE ${route.id + 1}`})}}> Next </button>
-				<button onClick = {() => {nav.reset({ id:0, name: 'PAGE 0'})}}> Reset </button>
+				<button onClick = {previousPage}> Back </button>
+				<button onClick = {nextPage}> Next </button>
+				<button onClick = {resetStack}> Reset </button>
 				
 				<div>
 					<div> <input type = 'checkbox' /> A </div>
@@ -122,6 +143,7 @@ class App extends Component {
 			<Navigator				
 				initialRoute = {{id :0, name : 'PAGE 0'}}
 				renderRoute = {this.renderRoute.bind(this)}
+				animation = {{name : 'slide-right', duration : 500}}
 			/>
 		);
 	}
