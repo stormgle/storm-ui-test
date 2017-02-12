@@ -100,7 +100,7 @@ class App extends Component {
 	renderRoute(route, nav) {
 		function nextPage() {
 			if (route.id === 1) {
-				nav.push({ id: 2, name : 'PAGE 2'}, {animation : {name: 'slide-bottom'}});
+				nav.push({ id: 2, name : 'PAGE 2'}, {animation : 'slide-bottom'});
 			} else if (route.id === 2) {
 				nav.push({ id: 3, name : 'PAGE 3'}, {animation : 'none'});
 			} else {
@@ -109,7 +109,7 @@ class App extends Component {
 		}
 		function previousPage() {
 			if (route.id === 2) {
-				nav.pop({animation : {name: 'slide-bottom'}});
+				nav.pop({animation :'slide-bottom'});
 			} else if (route.id === 3) {
 				nav.pop({animation : 'none'});
 			} else {
@@ -117,7 +117,9 @@ class App extends Component {
 			}
 		}
 		function resetStack() {
-			nav.reset({animation : {name : 'slide-top'}});
+			nav.reset([{id: 0, name : 'PAGE 0'}],{animation :'slide-bottom'});
+			//nav.reset([{id: 0, name : 'PAGE 0'}]);
+			//nav.reset();
 		}
 		return (
 			<Page style = {{backgroundColor : colors[route.id]}}
@@ -143,7 +145,8 @@ class App extends Component {
 			<Navigator				
 				initialRoute = {{id :0, name : 'PAGE 0'}}
 				renderRoute = {this.renderRoute.bind(this)}
-				animation = {{name : 'slide-right', duration : 500}}
+				animation = 'slide-right'
+				animateOption = {{duration : 300}}
 			/>
 		);
 	}
