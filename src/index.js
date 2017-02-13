@@ -117,9 +117,9 @@ class App extends Component {
 			}
 		}
 		function resetStack() {
-			nav.reset([{id: 0, name : 'PAGE 0'}],{animation :'slide-bottom'});
+			//nav.reset([{id: 0, name : 'PAGE 0'}],{animation :'slide-bottom'});
 			//nav.reset([{id: 0, name : 'PAGE 0'}]);
-			//nav.reset();
+			nav.reset();
 		}
 		return (
 			<Page style = {{backgroundColor : colors[route.id]}}
@@ -142,11 +142,12 @@ class App extends Component {
 	render() {
 		console.log('# Strom-ui Test Program');
 		return (
-			<Navigator				
-				initialRoute = {{id :0, name : 'PAGE 0'}}
+			<Navigator	
+				initialRouteStack = {[ {id :0, name : 'PAGE 0'}, {id :1, name : 'PAGE 1'} ]}
+				initialRoute = {{id :2, name : 'PAGE 2'}}
 				renderRoute = {this.renderRoute.bind(this)}
 				animation = 'slide-right'
-				animateOption = {{duration : 300}}
+				animationOptions = {{duration : 500}}
 			/>
 		);
 	}

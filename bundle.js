@@ -214,7 +214,7 @@ var _class = function (_BaseComponent) {
       routeStack: []
     };
 
-    _this.bind('_pushToRouteStack', '_popFromRouteStack', 'push', 'pop', 'reset');
+    _this.bind('_getInitialRoutesFromProps', '_pushToRouteStack', '_popFromRouteStack', 'push', 'pop', 'reset');
 
     return _this;
   }
@@ -230,13 +230,8 @@ var _class = function (_BaseComponent) {
         });
       }
 
-      var routeStack = [];
-      if (this.props.initialRouteStack) {
-        routeStack = this._pushToRouteStack(this.props.initialRouteStack);
-      }
-      if (this.props.initialRoute) {
-        routeStack = this._pushToRouteStack(this.props.initialRoute, routeStack);
-      }
+      var routeStack = this._getInitialRoutesFromProps();
+
       this.setState({ routeStack: routeStack });
     }
   }, {
@@ -273,7 +268,7 @@ var _class = function (_BaseComponent) {
 
       // add new route with animation
       var anim = options.animation || this.props.animation || 'none';
-      var animOptions = options.animateOptions || this.props.animateOptions || null;
+      var animOptions = options.animationOptions || this.props.animationOptions || null;
       var animation = null;
       if (anim && anim !== 'none') {
         var _animOptions = _extends({}, animOptions);
@@ -292,6 +287,12 @@ var _class = function (_BaseComponent) {
       this.setState({ routeStack: routeStack });
       return this.navigator;
     }
+
+    /**
+     * @param {Any} route
+     * @param {Object} options (multiple, animation, animationOptions)
+     */
+
   }, {
     key: 'pop',
     value: function pop() {
@@ -302,7 +303,7 @@ var _class = function (_BaseComponent) {
       if (this.state.routeStack.length > 1) {
         // add animation for page pop out of screen
         var anim = options.animation || this.props.animation || 'none';
-        var animOptions = options.animateOptions || this.props.animateOptions || null;
+        var animOptions = options.animationOptions || this.props.animationOptions || null;
         var to = 0;
         if (anim && anim !== 'none') {
           var _animOptions = _extends({}, animOptions);
@@ -335,7 +336,7 @@ var _class = function (_BaseComponent) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       var routeStack = [];
-      if (routes && _util2.default.isObject(routes) && (routes.animation || routes.animateOptions)) {
+      if (routes && _util2.default.isObject(routes) && (routes.animation || routes.animationOptions)) {
         options = routes;
         routes = null;
       }
@@ -355,7 +356,7 @@ var _class = function (_BaseComponent) {
       }
       // apply animation if any
       var anim = options.animation || this.props.animation || 'none';
-      var animOptions = options.animateOptions || this.props.animateOptions || null;
+      var animOptions = options.animationOptions || this.props.animationOptions || null;
       if (anim && anim !== 'none') {
         var _animOptions = _extends({}, animOptions);
         _animOptions.duration = _animOptions.duration || 250;
@@ -386,8 +387,11 @@ var _class = function (_BaseComponent) {
       }
       routes.forEach(function (route) {
         uKey++;
-        routeStack.push(_extends({ _$key: uKey, route: route }, options));
+        routeStack.push(_extends({ _$key: uKey, lock: true, route: route }, options));
       });
+      if (routeStack.length > 0) {
+        routeStack[routeStack.length - 1].lock = false;
+      }
       return routeStack;
     }
   }, {
@@ -396,6 +400,18 @@ var _class = function (_BaseComponent) {
       var routeStack = stack;
       if (routeStack.length > 1) {
         routeStack.pop();
+      }
+      return routeStack;
+    }
+  }, {
+    key: '_getInitialRoutesFromProps',
+    value: function _getInitialRoutesFromProps() {
+      var routeStack = [];
+      if (this.props.initialRouteStack) {
+        routeStack = this._pushToRouteStack(this.props.initialRouteStack);
+      }
+      if (this.props.initialRoute) {
+        routeStack = this._pushToRouteStack(this.props.initialRoute, routeStack);
       }
       return routeStack;
     }
@@ -892,18 +908,12 @@ module.exports = emptyObject;
  * will remain to ensure logic does not differ in production.
  */
 
-var validateFormat = function validateFormat(format) {};
-
-if (process.env.NODE_ENV !== 'production') {
-  validateFormat = function validateFormat(format) {
+function invariant(condition, format, a, b, c, d, e, f) {
+  if (process.env.NODE_ENV !== 'production') {
     if (format === undefined) {
       throw new Error('invariant requires an error message argument');
     }
-  };
-}
-
-function invariant(condition, format, a, b, c, d, e, f) {
-  validateFormat(format);
+  }
 
   if (!condition) {
     var error;
@@ -995,15 +1005,8 @@ if (process.env.NODE_ENV !== 'production') {
 module.exports = warning;
 }).call(this,require('_process'))
 },{"./emptyFunction":9,"_process":64}],13:[function(require,module,exports){
-/*
-object-assign
-(c) Sindre Sorhus
-@license MIT
-*/
-
 'use strict';
 /* eslint-disable no-unused-vars */
-var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -1024,7 +1027,7 @@ function shouldUseNative() {
 		// Detect buggy property enumeration order in older V8 versions.
 
 		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+		var test1 = new String('abc');  // eslint-disable-line
 		test1[5] = 'de';
 		if (Object.getOwnPropertyNames(test1)[0] === '5') {
 			return false;
@@ -1053,7 +1056,7 @@ function shouldUseNative() {
 		}
 
 		return true;
-	} catch (err) {
+	} catch (e) {
 		// We don't expect any of the above to throw, but better to be safe.
 		return false;
 	}
@@ -1073,8 +1076,8 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 			}
 		}
 
-		if (getOwnPropertySymbols) {
-			symbols = getOwnPropertySymbols(from);
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
 			for (var i = 0; i < symbols.length; i++) {
 				if (propIsEnumerable.call(from, symbols[i])) {
 					to[symbols[i]] = from[symbols[i]];
@@ -1215,6 +1218,17 @@ var fourArgumentPooler = function (a1, a2, a3, a4) {
   }
 };
 
+var fiveArgumentPooler = function (a1, a2, a3, a4, a5) {
+  var Klass = this;
+  if (Klass.instancePool.length) {
+    var instance = Klass.instancePool.pop();
+    Klass.call(instance, a1, a2, a3, a4, a5);
+    return instance;
+  } else {
+    return new Klass(a1, a2, a3, a4, a5);
+  }
+};
+
 var standardReleaser = function (instance) {
   var Klass = this;
   !(instance instanceof Klass) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Trying to release an instance into a pool of a different type.') : _prodInvariant('25') : void 0;
@@ -1254,7 +1268,8 @@ var PooledClass = {
   oneArgumentPooler: oneArgumentPooler,
   twoArgumentPooler: twoArgumentPooler,
   threeArgumentPooler: threeArgumentPooler,
-  fourArgumentPooler: fourArgumentPooler
+  fourArgumentPooler: fourArgumentPooler,
+  fiveArgumentPooler: fiveArgumentPooler
 };
 
 module.exports = PooledClass;
@@ -2433,38 +2448,30 @@ typeof Set === 'function' && isNative(Set) &&
 // Set.prototype.keys
 Set.prototype != null && typeof Set.prototype.keys === 'function' && isNative(Set.prototype.keys);
 
-var setItem;
-var getItem;
-var removeItem;
-var getItemIDs;
-var addRoot;
-var removeRoot;
-var getRootIDs;
-
 if (canUseCollections) {
   var itemMap = new Map();
   var rootIDSet = new Set();
 
-  setItem = function (id, item) {
+  var setItem = function (id, item) {
     itemMap.set(id, item);
   };
-  getItem = function (id) {
+  var getItem = function (id) {
     return itemMap.get(id);
   };
-  removeItem = function (id) {
+  var removeItem = function (id) {
     itemMap['delete'](id);
   };
-  getItemIDs = function () {
+  var getItemIDs = function () {
     return Array.from(itemMap.keys());
   };
 
-  addRoot = function (id) {
+  var addRoot = function (id) {
     rootIDSet.add(id);
   };
-  removeRoot = function (id) {
+  var removeRoot = function (id) {
     rootIDSet['delete'](id);
   };
-  getRootIDs = function () {
+  var getRootIDs = function () {
     return Array.from(rootIDSet.keys());
   };
 } else {
@@ -2480,31 +2487,31 @@ if (canUseCollections) {
     return parseInt(key.substr(1), 10);
   };
 
-  setItem = function (id, item) {
+  var setItem = function (id, item) {
     var key = getKeyFromID(id);
     itemByKey[key] = item;
   };
-  getItem = function (id) {
+  var getItem = function (id) {
     var key = getKeyFromID(id);
     return itemByKey[key];
   };
-  removeItem = function (id) {
+  var removeItem = function (id) {
     var key = getKeyFromID(id);
     delete itemByKey[key];
   };
-  getItemIDs = function () {
+  var getItemIDs = function () {
     return Object.keys(itemByKey).map(getIDFromKey);
   };
 
-  addRoot = function (id) {
+  var addRoot = function (id) {
     var key = getKeyFromID(id);
     rootByKey[key] = true;
   };
-  removeRoot = function (id) {
+  var removeRoot = function (id) {
     var key = getKeyFromID(id);
     delete rootByKey[key];
   };
-  getRootIDs = function () {
+  var getRootIDs = function () {
     return Object.keys(rootByKey).map(getIDFromKey);
   };
 }
@@ -3448,14 +3455,7 @@ var ReactElementValidator = {
     // We warn in this case but don't throw. We expect the element creation to
     // succeed and there will likely be errors in render.
     if (!validType) {
-      if (typeof type !== 'function' && typeof type !== 'string') {
-        var info = '';
-        if (type === undefined || typeof type === 'object' && type !== null && Object.keys(type).length === 0) {
-          info += ' You likely forgot to export your component from the file ' + 'it\'s defined in.';
-        }
-        info += getDeclarationErrorAddendum();
-        process.env.NODE_ENV !== 'production' ? warning(false, 'React.createElement: type is invalid -- expected a string (for ' + 'built-in components) or a class/function (for composite ' + 'components) but got: %s.%s', type == null ? type : typeof type, info) : void 0;
-      }
+      process.env.NODE_ENV !== 'production' ? warning(false, 'React.createElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : void 0;
     }
 
     var element = ReactElement.createElement.apply(this, arguments);
@@ -4151,7 +4151,7 @@ module.exports = ReactPureComponent;
 
 'use strict';
 
-module.exports = '15.4.2';
+module.exports = '15.4.0';
 },{}],32:[function(require,module,exports){
 (function (process){
 /**
@@ -4782,9 +4782,9 @@ var App = function (_Component3) {
 				}
 			}
 			function resetStack() {
-				nav.reset([{ id: 0, name: 'PAGE 0' }], { animation: 'slide-bottom' });
+				//nav.reset([{id: 0, name : 'PAGE 0'}],{animation :'slide-bottom'});
 				//nav.reset([{id: 0, name : 'PAGE 0'}]);
-				//nav.reset();
+				nav.reset();
 			}
 			return _react2.default.createElement(
 				_reactStormUi.Page,
@@ -4850,10 +4850,11 @@ var App = function (_Component3) {
 		value: function render() {
 			console.log('# Strom-ui Test Program');
 			return _react2.default.createElement(_reactStormUi.Navigator, {
-				initialRoute: { id: 0, name: 'PAGE 0' },
+				initialRouteStack: [{ id: 0, name: 'PAGE 0' }, { id: 1, name: 'PAGE 1' }],
+				initialRoute: { id: 2, name: 'PAGE 2' },
 				renderRoute: this.renderRoute.bind(this),
 				animation: 'slide-right',
-				animateOption: { duration: 300 }
+				animationOptions: { duration: 500 }
 			});
 		}
 	}]);
@@ -8321,28 +8322,6 @@ var getDictionaryKey = function (inst) {
   return '.' + inst._rootNodeID;
 };
 
-function isInteractive(tag) {
-  return tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea';
-}
-
-function shouldPreventMouseEvent(name, type, props) {
-  switch (name) {
-    case 'onClick':
-    case 'onClickCapture':
-    case 'onDoubleClick':
-    case 'onDoubleClickCapture':
-    case 'onMouseDown':
-    case 'onMouseDownCapture':
-    case 'onMouseMove':
-    case 'onMouseMoveCapture':
-    case 'onMouseUp':
-    case 'onMouseUpCapture':
-      return !!(props.disabled && isInteractive(type));
-    default:
-      return false;
-  }
-}
-
 /**
  * This is a unified interface for event plugins to be installed and configured.
  *
@@ -8411,12 +8390,7 @@ var EventPluginHub = {
    * @return {?function} The stored callback.
    */
   getListener: function (inst, registrationName) {
-    // TODO: shouldPreventMouseEvent is DOM-specific and definitely should not
-    // live here; needs to be moved to a better place soon
     var bankForRegistrationName = listenerBank[registrationName];
-    if (shouldPreventMouseEvent(registrationName, inst._currentElement.type, inst._currentElement.props)) {
-      return null;
-    }
     var key = getDictionaryKey(inst);
     return bankForRegistrationName && bankForRegistrationName[key];
   },
@@ -10404,7 +10378,7 @@ var ReactCompositeComponent = {
       // Since plain JS classes are defined without any special initialization
       // logic, we can not catch common errors early. Therefore, we have to
       // catch them here, at initialization time, instead.
-      process.env.NODE_ENV !== 'production' ? warning(!inst.getInitialState || inst.getInitialState.isReactClassApproved || inst.state, 'getInitialState was defined on %s, a plain JavaScript class. ' + 'This is only supported for classes created using React.createClass. ' + 'Did you mean to define a state property instead?', this.getName() || 'a component') : void 0;
+      process.env.NODE_ENV !== 'production' ? warning(!inst.getInitialState || inst.getInitialState.isReactClassApproved, 'getInitialState was defined on %s, a plain JavaScript class. ' + 'This is only supported for classes created using React.createClass. ' + 'Did you mean to define a state property instead?', this.getName() || 'a component') : void 0;
       process.env.NODE_ENV !== 'production' ? warning(!inst.getDefaultProps || inst.getDefaultProps.isReactClassApproved, 'getDefaultProps was defined on %s, a plain JavaScript class. ' + 'This is only supported for classes created using React.createClass. ' + 'Use a static property to define defaultProps instead.', this.getName() || 'a component') : void 0;
       process.env.NODE_ENV !== 'production' ? warning(!inst.propTypes, 'propTypes was defined as an instance property on %s. Use a static ' + 'property to define propTypes instead.', this.getName() || 'a component') : void 0;
       process.env.NODE_ENV !== 'production' ? warning(!inst.contextTypes, 'contextTypes was defined as an instance property on %s. Use a ' + 'static property to define contextTypes instead.', this.getName() || 'a component') : void 0;
@@ -11870,18 +11844,12 @@ ReactDOMComponent.Mixin = {
     } else {
       var contentToUse = CONTENT_TYPES[typeof props.children] ? props.children : null;
       var childrenToUse = contentToUse != null ? null : props.children;
-      // TODO: Validate that text is allowed as a child of this node
       if (contentToUse != null) {
-        // Avoid setting textContent when the text is empty. In IE11 setting
-        // textContent on a text area will cause the placeholder to not
-        // show within the textarea until it has been focused and blurred again.
-        // https://github.com/facebook/react/issues/6731#issuecomment-254874553
-        if (contentToUse !== '') {
-          if (process.env.NODE_ENV !== 'production') {
-            setAndValidateContentChildDev.call(this, contentToUse);
-          }
-          DOMLazyTree.queueText(lazyTree, contentToUse);
+        // TODO: Validate that text is allowed as a child of this node
+        if (process.env.NODE_ENV !== 'production') {
+          setAndValidateContentChildDev.call(this, contentToUse);
         }
+        DOMLazyTree.queueText(lazyTree, contentToUse);
       } else if (childrenToUse != null) {
         var mountImages = this.mountChildren(childrenToUse, transaction, context);
         for (var i = 0; i < mountImages.length; i++) {
@@ -12233,13 +12201,6 @@ var Flags = ReactDOMComponentFlags;
 var internalInstanceKey = '__reactInternalInstance$' + Math.random().toString(36).slice(2);
 
 /**
- * Check if a given node should be cached.
- */
-function shouldPrecacheNode(node, nodeID) {
-  return node.nodeType === 1 && node.getAttribute(ATTR_NAME) === String(nodeID) || node.nodeType === 8 && node.nodeValue === ' react-text: ' + nodeID + ' ' || node.nodeType === 8 && node.nodeValue === ' react-empty: ' + nodeID + ' ';
-}
-
-/**
  * Drill down (through composites and empty components) until we get a host or
  * host text component.
  *
@@ -12304,7 +12265,7 @@ function precacheChildNodes(inst, node) {
     }
     // We assume the child nodes are in the same order as the child instances.
     for (; childNode !== null; childNode = childNode.nextSibling) {
-      if (shouldPrecacheNode(childNode, childID)) {
+      if (childNode.nodeType === 1 && childNode.getAttribute(ATTR_NAME) === String(childID) || childNode.nodeType === 8 && childNode.nodeValue === ' react-text: ' + childID + ' ' || childNode.nodeType === 8 && childNode.nodeValue === ' react-empty: ' + childID + ' ') {
         precacheNode(childInst, childNode);
         continue outer;
       }
@@ -12712,17 +12673,7 @@ var ReactDOMInput = {
       }
     } else {
       if (props.value == null && props.defaultValue != null) {
-        // In Chrome, assigning defaultValue to certain input types triggers input validation.
-        // For number inputs, the display value loses trailing decimal points. For email inputs,
-        // Chrome raises "The specified value <x> is not a valid email address".
-        //
-        // Here we check to see if the defaultValue has actually changed, avoiding these problems
-        // when the user is inputting text
-        //
-        // https://github.com/facebook/react/issues/7253
-        if (node.defaultValue !== '' + props.defaultValue) {
-          node.defaultValue = '' + props.defaultValue;
-        }
+        node.defaultValue = '' + props.defaultValue;
       }
       if (props.checked == null && props.defaultChecked != null) {
         node.defaultChecked = !!props.defaultChecked;
@@ -13817,15 +13768,9 @@ var ReactDOMTextarea = {
     // This is in postMount because we need access to the DOM node, which is not
     // available until after the component has mounted.
     var node = ReactDOMComponentTree.getNodeFromInstance(inst);
-    var textContent = node.textContent;
 
-    // Only set node.value if textContent is equal to the expected
-    // initial value. In IE10/IE11 there is a bug where the placeholder attribute
-    // will populate textContent as well.
-    // https://developer.microsoft.com/microsoft-edge/platform/issues/101525/
-    if (textContent === inst._wrapperState.initialValue) {
-      node.value = textContent;
-    }
+    // Warning: node.value may be the empty string at this point (IE11) if placeholder is set.
+    node.value = node.textContent; // Detach value from defaultValue
   }
 };
 
@@ -14942,11 +14887,14 @@ module.exports = ReactFeatureFlags;
 
 'use strict';
 
-var _prodInvariant = require('./reactProdInvariant');
+var _prodInvariant = require('./reactProdInvariant'),
+    _assign = require('object-assign');
 
 var invariant = require('fbjs/lib/invariant');
 
 var genericComponentClass = null;
+// This registry keeps track of wrapper classes around host tags.
+var tagToComponentClass = {};
 var textComponentClass = null;
 
 var ReactHostComponentInjection = {
@@ -14959,6 +14907,11 @@ var ReactHostComponentInjection = {
   // rendered as props.
   injectTextComponentClass: function (componentClass) {
     textComponentClass = componentClass;
+  },
+  // This accepts a keyed object with classes as values. Each key represents a
+  // tag. That particular tag will use this class instead of the generic one.
+  injectComponentClasses: function (componentClasses) {
+    _assign(tagToComponentClass, componentClasses);
   }
 };
 
@@ -14998,7 +14951,7 @@ var ReactHostComponent = {
 
 module.exports = ReactHostComponent;
 }).call(this,require('_process'))
-},{"./reactProdInvariant":185,"_process":64,"fbjs/lib/invariant":55}],123:[function(require,module,exports){
+},{"./reactProdInvariant":185,"_process":64,"fbjs/lib/invariant":55,"object-assign":63}],123:[function(require,module,exports){
 /**
  * Copyright 2016-present, Facebook, Inc.
  * All rights reserved.
@@ -18219,6 +18172,18 @@ function isInteractive(tag) {
   return tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea';
 }
 
+function shouldPreventMouseEvent(inst) {
+  if (inst) {
+    var disabled = inst._currentElement && inst._currentElement.props.disabled;
+
+    if (disabled) {
+      return isInteractive(inst._tag);
+    }
+  }
+
+  return false;
+}
+
 var SimpleEventPlugin = {
 
   eventTypes: eventTypes,
@@ -18289,7 +18254,10 @@ var SimpleEventPlugin = {
       case 'topMouseDown':
       case 'topMouseMove':
       case 'topMouseUp':
-      // TODO: Disabled elements should not respond to mouse events
+        // Disabled elements should not respond to mouse events
+        if (shouldPreventMouseEvent(targetInst)) {
+          return null;
+        }
       /* falls through */
       case 'topMouseOut':
       case 'topMouseOver':
@@ -20624,17 +20592,7 @@ function instantiateReactComponent(node, shouldHaveDebugID) {
     instance = ReactEmptyComponent.create(instantiateReactComponent);
   } else if (typeof node === 'object') {
     var element = node;
-    var type = element.type;
-    if (typeof type !== 'function' && typeof type !== 'string') {
-      var info = '';
-      if (process.env.NODE_ENV !== 'production') {
-        if (type === undefined || typeof type === 'object' && type !== null && Object.keys(type).length === 0) {
-          info += ' You likely forgot to export your component from the file ' + 'it\'s defined in.';
-        }
-      }
-      info += getDeclarationErrorAddendum(element._owner);
-      !false ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s', type == null ? type : typeof type, info) : _prodInvariant('130', type == null ? type : typeof type, info) : void 0;
-    }
+    !(element && (typeof element.type === 'function' || typeof element.type === 'string')) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s', element.type == null ? element.type : typeof element.type, getDeclarationErrorAddendum(element._owner)) : _prodInvariant('130', element.type == null ? element.type : typeof element.type, getDeclarationErrorAddendum(element._owner)) : void 0;
 
     // Special case string values
     if (typeof element.type === 'string') {
