@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { render } from 'react-dom'
 
 
-import { Page, Navigator } from 'react-storm-ui'
+import { Page, Navigator } from 'react-sg'
 
 let i = 0;
 
