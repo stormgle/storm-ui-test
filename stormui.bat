@@ -8,9 +8,9 @@ rem ----------------------------------------------------------------------------
 cd ../
 
 rem Clean up previous build
-IF EXIST react-storm-ui\dist (
-	rmdir /s /q react-storm-ui\dist
-	echo # cleaned react-storm-ui previous build
+IF EXIST react-sg\dist (
+	rmdir /s /q react-sg\dist
+	echo # cleaned react-sg previous build
 )
 
 IF EXIST storm-ui-test\dist (
@@ -19,7 +19,7 @@ IF EXIST storm-ui-test\dist (
 )
 
 rem build storm ui react library
-cd react-storm-ui
+cd react-sg
 call npm run build && (
 	echo # storm-ui react library build completed
 	cd ../
