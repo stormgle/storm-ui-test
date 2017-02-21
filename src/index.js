@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { render } from 'react-dom'
 
 
-import { Page, Navigator } from 'react-sg'
+import { Page, Navigator, Splitter, SplitterSide, SplitterContent } from 'react-sg'
 
 let i = 0;
 
@@ -95,7 +95,7 @@ class LandingPage extends Component {
 	}
 }
 
-class App extends Component {
+class NavApp extends Component {
 	
 	renderRoute(route, nav) {
 		function nextPage() {
@@ -170,4 +170,47 @@ class App extends Component {
 	}
 }
 
+class App extends Component {
+	
+	constructor(props) {
+		super(props);
+		
+		this.state = { isOpenMenu : false };
+		
+	}
+	
+	render() {		
+		return (
+
+				<Splitter>
+					<SplitterSide 
+
+						side = 'right'
+						isOpen = {this.state.isOpenMenu}
+						shouldLockContent = {true}
+						animation	= 'slide'
+						>
+						<h3> HEADING 3 </h3>
+						<br />
+						<button onClick = {this.closeMenu.bind(this)} > close </button>
+					</SplitterSide>
+					<SplitterContent>
+						<div> Content </div>
+						<button onClick = {this.toggleMenu.bind(this)} style = {{right : 0, position: 'absolute'}} > Menu </button>
+					</SplitterContent>
+				</Splitter>
+
+		);
+	}
+	
+	toggleMenu() {
+		this.setState({ isOpenMenu : !this.state.isOpenMenu });
+	}
+	
+	closeMenu() {
+		this.setState({ isOpenMenu : false });
+	}
+}
+
+console.log ('App Test program')
 render( <App />, document.getElementById('root'));
